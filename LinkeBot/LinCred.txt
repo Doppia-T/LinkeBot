@@ -1,7 +1,7 @@
-# ISTRUZIONI
-# Sostituire <INDIRIZZOEMAIL> e <PASSWORDDIACCESSO> con le proprie credenziali di accesso al social
-# Fare attenzione agli spazi: ce ne deve essere uno dopo il simbolo "=" e nessuno dopo le proprie credenziali
+# INSTRUCTIONS
+# Replace <EMAILADDRESS> and <PASSWORD> with your social login credentials
+# PAY ATTENTION TO SPACES: there must be only one after the "=" symbol and none after your credentials
 
 
-id = <INDIRIZZOEMAIL>
-password = <PASSWORDDIACCESSO>
+id = <EMAILADDRESS>
+password = <PASSWORD>
