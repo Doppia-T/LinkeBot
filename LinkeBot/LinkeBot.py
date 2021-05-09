@@ -51,7 +51,7 @@ class LinkeBot:
 
     def like_post(self,profile):
         bot = self.bot
-        bot.get('https://www.linkedin.com/in/'+profile+'/') #inserire il def per dove prendere il profile
+        bot.get('https://www.linkedin.com/in/'+profile+'/') #insert the "def" for where to get the profile
         time.sleep(2)
 
 
