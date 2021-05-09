@@ -1,0 +1,7 @@
+# ISTRUZIONI
+# Sostituire <INDIRIZZOEMAIL> e <PASSWORDDIACCESSO> con le proprie credenziali di accesso al social
+# Fare attenzione agli spazi: ce ne deve essere uno dopo il simbolo "=" e nessuno dopo le proprie credenziali
+
+
+id = <INDIRIZZOEMAIL>
+password = <PASSWORDDIACCESSO>
