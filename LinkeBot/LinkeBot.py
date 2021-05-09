@@ -65,5 +65,5 @@ LinkePassword = get_LinkePSS()
 TestBot = LinkeBot(LinkeUsername,LinkePassword)
 TestBot.login()
 
-#feature in development
+#feature under development
 #TestBot.like_post('null')
