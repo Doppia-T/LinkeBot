@@ -8,5 +8,3 @@ def get_LinkePage():
         for line in find_target:
             LinkeTarget = line
             return LinkeTarget
-
-# start research of page
