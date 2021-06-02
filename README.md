@@ -10,4 +10,4 @@ This bot is designed to get the credentials of the LinkedIn profile from an exte
 
 LinkeBot is not affiliated with, sponsored, authorised or endorsed by Microsoft Corporation, LinkedIn or any of their affiliates or subsidiaries. This is an independent and unofficial project. 
 
-LinkeBot violates LinkedIn's User Agreement Section 8.2 ("Don’ts"), paragraph 2, and, for this reason, LinkedIn may temporarily or even permantly ban your account.
+LinkeBot violates LinkedIn's User Agreement Section 8.2 ("*Don’ts*"), paragraph 2, and, for this reason, LinkedIn may temporarily or even permantly ban your account.
