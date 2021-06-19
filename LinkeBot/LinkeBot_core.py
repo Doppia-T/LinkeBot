@@ -26,10 +26,16 @@ class LinkeBot_BOT:
         password.send_keys(Keys.RETURN)
         time.sleep(2)
 
-    def search_LinkePage(self, LinkeGetTarget):
-        bot = self.bot
+    # search for a specific "target", like a company or a person, within LinkedIn
 
+    def search_LinkePage(self, target):
+        bot = self.bot
+        
         import LinkeBot_import_target
-        LinkeGetTarget = LinkeBot_import_target.get_LinkeTarget()
-        bot.get(('https://www.linkedin.com/search/results/all/?keywords=' + LinkeGetTarget + '&origin=GLOBAL_SEARCH_HEADER'))
-        time.sleep(2)
+        target = LinkeBot_import_target.get_LinkeTarget()
+        
+        search = bot.find_element_by_xpath("//input[@class='search-global-typeahead__input always-show-placeholder']").click()
+        search.send_keys(target)
+        search.submit()
+        time.sleep(2) 
+        
