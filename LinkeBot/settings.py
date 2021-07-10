@@ -6,7 +6,7 @@ from loguru import logger
 PROJECTNAME = "linkebot"
 
 BASEDIR = Path(__file__).resolve().parent.parent
-CONFIGDIR = BASEDIR / f"{PROJECTNAME}/config"
+CONFIGDIR = BASEDIR / PROJECTNAME / "config"
 OUTPUTDIR = BASEDIR / "output"
 
 # Loguru config
@@ -27,3 +27,4 @@ logger.add(
 # URLS
 LINKEDIN_BASE = "https://linkedin.com/"
 HEADLESS = True
+DRIVERNAME = "geckodriver.exe"
