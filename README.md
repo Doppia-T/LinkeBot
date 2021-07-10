@@ -3,7 +3,51 @@
 
 This is a first attempt to create a bot capable of managing a LinkedIn profile. It uses [Selenium WebDriver package](https://pypi.org/project/selenium/) and, since it is written for being used with [Mozilla Firefox](https://www.mozilla.org/it/firefox/new/) browser, [GeckoDriver](https://github.com/mozilla/geckodriver/releases). 
 
-This bot is designed to get the credentials of the LinkedIn profile from an external `.txt` file so that anyone can change the used profile -or its password -  without the need of modifying the source code. Said file has to be put in the same folder with the others LinkeBot's `.py` files. 
+This bot is designed to get the credentials of the LinkedIn profile from an external `.txt` file so that anyone can change the used profile -or its password -  without the need of modifying the source code. Said file has to be put in the same folder with the others LinkeBot's `.py` files.
+
+# Bot Setup
+## Requirements
+
+Use following comamnd for the requirements installation.
+
+```bash
+pip install -r requirements.txt
+```
+
+For the development requirements use:
+```bash
+pip install -r requirements.dev.txt
+```
+
+## Driver Setup
+Linkebot uses `geckodriver` so download the latest driver from following link and set that up inside the `drivers` directory. Change the file name to `geckodriver`.
+
+## Additional requiements setup
+Since Linkebot requires user's credentials and targets to operate. You have to setup the credentials in `config/credentials.yaml` file.
+
+Sample:
+```yaml
+# linkebot/config/credentials.yaml
+
+email: myemail@email.com
+password: mystrongpassword
+```
+
+For the target setup, edit the `targets.yaml` file inside the same directory.
+
+```yaml
+
+pages: # Do not change this key
+  - "Amazon"
+  - "Apple"
+
+```
+## Run
+To run the Linkebot use the following commands:
+```bash
+python main.py
+```
+
 
 # Legal notes
 **Warnings and disclaimer**
