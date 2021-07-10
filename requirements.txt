@@ -1,0 +1,5 @@
+selenium
+requests
+beautifulsoup4
+loguru
+rich==9.10.0
