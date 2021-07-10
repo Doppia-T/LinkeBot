@@ -1,4 +1,6 @@
 *.log
 .venv
 __pycache__
-geckodriver
+!drivers
+drivers/**/**
+.vscode
