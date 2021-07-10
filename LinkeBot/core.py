@@ -1,8 +1,15 @@
+import time
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from .settings import LINKEDIN_BASE
-import time
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver
+
+from .settings import BASEDIR, HEADLESS, LINKEDIN_BASE
+
+options = Options()
+options.headless = HEADLESS
+# options.add_argument("--headless")
 
 
 class LinkeBot:
@@ -10,7 +17,10 @@ class LinkeBot:
     def __init__(self, username: str, password: str) -> None:
         self.username = username
         self.password = password
-        self.bot: WebDriver = webdriver.Firefox()
+        self.bot: WebDriver = webdriver.Firefox(
+            options=options,
+            executable_path=BASEDIR / "drivers/geckodriver",
+        )
 
     def login(self) -> None:
         bot = self.bot
