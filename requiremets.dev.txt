@@ -4,3 +4,4 @@ black
 autoflake
 isort
 pre-commit
+mypy
