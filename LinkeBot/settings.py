@@ -1,11 +1,13 @@
-from pathlib import Path
-from loguru import logger
 import sys
+from pathlib import Path
+
+from loguru import logger
 
 PROJECTNAME = "linkebot"
 
 BASEDIR = Path(__file__).resolve().parent.parent
 CONFIGDIR = BASEDIR / f"{PROJECTNAME}/config"
+OUTPUTDIR = BASEDIR / "output"
 
 # Loguru config
 logger.remove()
@@ -24,3 +26,4 @@ logger.add(
 
 # URLS
 LINKEDIN_BASE = "https://linkedin.com/"
+HEADLESS = True
