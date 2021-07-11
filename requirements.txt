@@ -2,4 +2,5 @@ selenium
 requests
 beautifulsoup4
 loguru
-rich==9.10.0
+rich
+PyQt5==5.15.2
