@@ -1,8 +1,13 @@
+import sys
+
+import requests
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtWidgets import QMessageBox, QWidget
 
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
+class LinkebotView(QWidget):
+    def setupUi(self, MainWindow, controller):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(850, 477)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -34,15 +39,17 @@ class Ui_MainWindow(object):
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 826, 115))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.scrollAreaWidgetContents)
+        self.gridLayout_2.setObjectName("gridLayout_2")
         self.logs = QtWidgets.QTextEdit(self.scrollAreaWidgetContents)
-        self.logs.setEnabled(False)
-        self.logs.setGeometry(QtCore.QRect(0, 0, 821, 211))
+        self.logs.setReadOnly(True)
         self.logs.setStyleSheet("")
         self.logs.setObjectName("logs")
+        self.gridLayout_2.addWidget(self.logs, 0, 0, 1, 1)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.gridLayout.addWidget(self.scrollArea, 6, 0, 1, 1)
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
         self.gridLayout.addWidget(self.progressBar, 1, 0, 1, 1)
         self.formLayout_2 = QtWidgets.QFormLayout()
@@ -98,10 +105,17 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-        self.retranslateUi(MainWindow)
+        self.retranslateUi(MainWindow, controller)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    def retranslateUi(self, MainWindow):
+    @staticmethod
+    def popup(type="Info", msg=None):
+        msg_ = QMessageBox()
+        msg_.setWindowTitle(f"{type}")
+        msg_.setText(msg)
+        msg_.exec_()
+
+    def retranslateUi(self, MainWindow, controller):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.usernameLabel.setText(_translate("MainWindow", "Username"))
@@ -121,16 +135,98 @@ class Ui_MainWindow(object):
         self.commentCheck.setText(_translate("MainWindow", "Coment"))
         self.label_2.setText(_translate("MainWindow", "LINKEBOT"))
         self.startBtn.setText(_translate("MainWindow", "Start"))
+        self.startBtn.clicked.connect(controller.start_scraper)
         self.stopBtn.setText(_translate("MainWindow", "Stop"))
+        self.stopBtn.clicked.connect(controller.stop_task)
         self.label.setText(_translate("MainWindow", "Logs Output"))
 
 
-if __name__ == "__main__":
-    import sys
+class Worker(QObject):
+    finished = pyqtSignal()
+    progress = pyqtSignal(int)
+    log = pyqtSignal(str)
 
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())
+    def __init__(self) -> None:
+        super().__init__()
+
+    def run(self):
+        for i in range(101):
+            res = requests.get("https://httpbin.org/uuid").json()["uuid"]
+            self.log.emit(res)
+            self.progress.emit(i)
+        self.finished.emit()
+
+
+class Controller:
+    def __init__(self):
+        self.view = None
+        self.thread = None
+        self.worker = None
+
+    def start(self, view):
+        app = QtWidgets.QApplication(sys.argv)
+        MainWindow = QtWidgets.QMainWindow()
+        self.view = view()
+        self.view.setupUi(MainWindow, self)
+        MainWindow.show()
+        sys.exit(app.exec_())
+
+    def cleanup(self):
+        self.view.progressBar.setProperty("value", 0)
+
+        self.view.logs.clear()
+
+    def start_scraper(self):
+        self.cleanup()
+        self.run_task()
+
+    def reportProgress(self, progress):
+        self.view.progressBar.setProperty("value", progress)
+
+    def reportLogs(self, log):
+        self.view.logs.append(log)
+
+    def validate(self):
+
+        if not self.view.username.text():
+            self.view.popup(msg="Username is rquried", type="Error")
+            return False
+        if not self.view.password.text():
+            self.view.popup(msg="Password is rquried", type="Error")
+            return False
+        return True
+
+    def stop_task(self):
+        if self.thread:
+            self.thread.quit()
+            self.thread.deleteLater()
+
+            self.view.logs.append("stopped!")
+
+        # self.handle_scraoer(state="STOP")
+
+    def run_task(self):
+        is_valid = self.validate()
+        if is_valid:
+            self.thread = QThread()
+            self.worker = Worker()
+            self.worker.moveToThread(self.thread)
+
+            self.thread.started.connect(self.worker.run)
+            self.thread.started.connect(lambda: self.view.startBtn.setEnabled(False))
+            self.worker.finished.connect(self.thread.quit)
+            self.worker.finished.connect(self.worker.deleteLater)
+            self.thread.finished.connect(self.thread.deleteLater)
+            self.worker.progress.connect(self.reportProgress)
+            self.worker.log.connect(self.reportLogs)
+
+            self.thread.start()
+            self.thread.finished.connect(lambda: self.view.startBtn.setEnabled(True))
+            self.thread.finished.connect(
+                lambda: self.view.logs.append("Linkebot job completed.")
+            )
+
+
+if __name__ == "__main__":
+    c = Controller()
+    c.start(LinkebotView)
