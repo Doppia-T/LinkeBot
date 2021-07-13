@@ -1,8 +1,7 @@
 from typing import Tuple
 
-from linkebot.utils import yaml_loader
-
 from .settings import CONFIGDIR
+from .utils import yaml_loader
 
 
 def get_linkedin_creds() -> Tuple[str, str]:
