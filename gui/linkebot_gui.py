@@ -5,6 +5,8 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QWidget
 
+from linkebot.handlers import get_linkedin_creds, get_targets
+
 
 class LinkebotView(QWidget):
     def setupUi(self, MainWindow, controller):
@@ -16,17 +18,15 @@ class LinkebotView(QWidget):
         self.gridLayout.setObjectName("gridLayout")
         self.formLayout = QtWidgets.QFormLayout()
         self.formLayout.setObjectName("formLayout")
-        self.usernameLabel = QtWidgets.QLabel(self.centralwidget)
-        self.usernameLabel.setObjectName("usernameLabel")
-        self.formLayout.setWidget(
-            0, QtWidgets.QFormLayout.LabelRole, self.usernameLabel
-        )
+        self.emailLabel = QtWidgets.QLabel(self.centralwidget)
+        self.emailLabel.setObjectName("emailLabel")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.emailLabel)
         self.password = QtWidgets.QLineEdit(self.centralwidget)
         self.password.setObjectName("password")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.password)
-        self.username = QtWidgets.QLineEdit(self.centralwidget)
-        self.username.setObjectName("username")
-        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.username)
+        self.email = QtWidgets.QLineEdit(self.centralwidget)
+        self.email.setObjectName("email")
+        self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.email)
         self.passwordLabel = QtWidgets.QLabel(self.centralwidget)
         self.passwordLabel.setObjectName("passwordLabel")
         self.formLayout.setWidget(
@@ -117,9 +117,14 @@ class LinkebotView(QWidget):
 
     def retranslateUi(self, MainWindow, controller):
         _translate = QtCore.QCoreApplication.translate
+
+        _email, _password = get_linkedin_creds()
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.usernameLabel.setText(_translate("MainWindow", "Username"))
+        self.emailLabel.setText(_translate("MainWindow", "Email"))
+        self.email.setText(_email)
         self.passwordLabel.setText(_translate("MainWindow", "Password"))
+        self.password.setText(_password)
+
         self.logs.setHtml(
             _translate(
                 "MainWindow",
@@ -130,7 +135,10 @@ class LinkebotView(QWidget):
                 '<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><br /></p></body></html>',
             )
         )
-        self.searchCheck.setText(_translate("MainWindow", "Search"))
+        self.searchCheck.setText(_translate("MainWindow", "Search Targets"))
+        targets = get_targets()
+        self.searchInput.setText(", ".join(targets))
+
         self.likeCheck.setText(_translate("MainWindow", "Like random posts"))
         self.commentCheck.setText(_translate("MainWindow", "Coment"))
         self.label_2.setText(_translate("MainWindow", "LINKEBOT"))
@@ -188,8 +196,8 @@ class Controller:
 
     def validate(self):
 
-        if not self.view.username.text():
-            self.view.popup(msg="Username is rquried", type="Error")
+        if not self.view.email.text():
+            self.view.popup(msg="email is rquried", type="Error")
             return False
         if not self.view.password.text():
             self.view.popup(msg="Password is rquried", type="Error")
