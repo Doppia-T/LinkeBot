@@ -67,7 +67,7 @@ python -m gui.linkebot_gui
 Or just go into the `gui` directory and run:
 
 ```
-python -m linkebot_gui.py
+python linkebot_gui.py
 ```
 
 # Legal notes
