@@ -1,6 +1,0 @@
-# INSTRUCTIONS
-# Replace <PAGETOSEARCH> with the LinkedId page to search
-
-pages: # Do not change this key
-  - "<PAGETOSEARCH>"
-  - "<PAGETOSEARCH>"
