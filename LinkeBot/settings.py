@@ -6,7 +6,7 @@ from loguru import logger
 PROJECTNAME = "linkebot"
 
 BASEDIR = Path(__file__).resolve().parent.parent
-CONFIGDIR = BASEDIR / PROJECTNAME / "config"
+CONFIGDIR = BASEDIR / "config"
 OUTPUTDIR = BASEDIR / "output"
 
 # Loguru config
