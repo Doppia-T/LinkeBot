@@ -5,3 +5,4 @@ autoflake
 isort
 pre-commit
 mypy
+types-requests
