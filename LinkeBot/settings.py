@@ -26,5 +26,5 @@ logger.add(
 
 # URLS
 LINKEDIN_BASE = "https://linkedin.com/"
-HEADLESS = True
+HEADLESS = False
 DRIVERNAME = "geckodriver.exe"

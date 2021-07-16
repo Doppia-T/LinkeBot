@@ -1,10 +1,11 @@
 import sys
+from datetime import datetime as time
 
-import requests
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 from PyQt5.QtWidgets import QMessageBox, QWidget
 
+from linkebot.core import LinkeBot
 from linkebot.handlers import get_linkedin_creds, get_targets
 
 
@@ -164,13 +165,33 @@ class Worker(QObject):
         self.threadActive = False
         # self.wait()
 
-    def run(self):
+    def run(self, username, password, targets):
 
         while self.threadActive:
-            res = requests.get("https://httpbin.org/uuid").json()["uuid"]
-            self.log.emit(res)
-            self.progress.emit(50)
-        self.finished.emit()
+
+            with LinkeBot(username=username, password=password) as linkebot:
+                self.log.emit(f"{time.now()}: Logging in to linkedin.")
+                logged_in = linkebot.login()
+                if not logged_in:
+                    self.log.emit(f"{time.now()}: Error during login.")
+                    self.finished.emit()
+
+                self.log.emit(f"{time.now()}: Login succesfull.")
+
+                self.log.emit(f"{time.now()}: Getting the targets.")
+
+                targets = get_targets()
+
+                for target in targets:
+                    self.log.emit(f"{time.now()}: Scraping target {target}.")
+
+                    linkebot.search(target)
+
+                self.log.emit(f"{time.now()}: Operation completed!")
+                self.finished.emit()
+                self.stop()
+
+    # self.finished.emit()
 
 
 class Controller:
@@ -227,7 +248,11 @@ class Controller:
             self.worker = Worker()
             self.worker.moveToThread(self.thread)
 
-            self.thread.started.connect(self.worker.run)
+            self.thread.started.connect(
+                lambda: self.worker.run(
+                    self.view.email.text(), self.view.password.text(), []
+                )
+            )
             self.thread.started.connect(lambda: self.view.startBtn.setEnabled(False))
             self.worker.finished.connect(self.thread.quit)
             self.worker.finished.connect(self.worker.deleteLater)
