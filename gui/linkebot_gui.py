@@ -22,6 +22,7 @@ class LinkebotView(QWidget):
         self.emailLabel.setObjectName("emailLabel")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.LabelRole, self.emailLabel)
         self.password = QtWidgets.QLineEdit(self.centralwidget)
+        self.password.setEchoMode(QtWidgets.QLineEdit.Password)
         self.password.setObjectName("password")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.password)
         self.email = QtWidgets.QLineEdit(self.centralwidget)
@@ -56,6 +57,7 @@ class LinkebotView(QWidget):
         self.formLayout_2.setObjectName("formLayout_2")
         self.searchCheck = QtWidgets.QCheckBox(self.centralwidget)
         self.searchCheck.setObjectName("searchCheck")
+        self.searchCheck.setChecked(True)
         self.formLayout_2.setWidget(
             0, QtWidgets.QFormLayout.LabelRole, self.searchCheck
         )
@@ -156,12 +158,18 @@ class Worker(QObject):
 
     def __init__(self) -> None:
         super().__init__()
+        self.threadActive = True
+
+    def stop(self) -> None:
+        self.threadActive = False
+        # self.wait()
 
     def run(self):
-        for i in range(101):
+
+        while self.threadActive:
             res = requests.get("https://httpbin.org/uuid").json()["uuid"]
             self.log.emit(res)
-            self.progress.emit(i)
+            self.progress.emit(50)
         self.finished.emit()
 
 
@@ -185,6 +193,7 @@ class Controller:
         self.view.logs.clear()
 
     def start_scraper(self):
+        self.view.startBtn.setEnabled(False)
         self.cleanup()
         self.run_task()
 
@@ -206,10 +215,8 @@ class Controller:
 
     def stop_task(self):
         if self.thread:
-            self.thread.quit()
-            self.thread.deleteLater()
-
-            self.view.logs.append("stopped!")
+            self.worker.stop()
+            # self.thread.deleteLater()
 
         # self.handle_scraoer(state="STOP")
 
