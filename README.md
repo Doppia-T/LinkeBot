@@ -28,18 +28,18 @@ Linkebot uses `geckodriver` so download the latest driver from following link an
 
 ## Additional requiements setup
 
-Since Linkebot requires user's credentials and targets to operate. You have to setup the credentials in `config/credentials.yaml` file.
+Since Linkebot requires user's credentials and targets to operate. You have to setup the credentials in `config/linkebot.yaml` file.
 
 Sample:
 
 ```yaml
-# linkebot/config/credentials.yaml
+# linkebot/config/linkebot.yaml
 
 email: myemail@email.com
 password: mystrongpassword
 ```
 
-For the target setup, edit the `targets.yaml` file inside the same directory.
+For the target setup, edit the `config/linkebot.yaml` file inside the same directory.
 
 ```yaml
 pages: # Do not change this key
