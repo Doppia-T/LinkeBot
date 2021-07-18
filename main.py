@@ -4,6 +4,7 @@ from linkebot.settings import logger
 
 
 def pipe() -> None:
+
     logger.info("Getting user's credentials.")
 
     username, password = get_linkedin_creds()
@@ -14,6 +15,7 @@ def pipe() -> None:
             Check your credentials.yaml file and follow the instructions."
         )
 
+    logger.info("Launching linkebot driver.")
     with LinkeBot(username=username, password=password) as linkebot:
         logger.info("Logging in to linkedin.")
         logged_in = linkebot.login()
@@ -27,10 +29,7 @@ def pipe() -> None:
 
         targets = get_targets()
 
-        for target in targets:
-            logger.info(f"Scraping target {target}.")
-
-            linkebot.search(target)
+        linkebot.search(targets)
 
         logger.info("Operation completed!")
         return
