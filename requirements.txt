@@ -1,6 +1,5 @@
 selenium
-requests
 beautifulsoup4
 loguru
-rich
 PyQt5==5.15.2
+pandas==1.3.0

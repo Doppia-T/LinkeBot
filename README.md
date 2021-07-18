@@ -39,7 +39,7 @@ email: myemail@email.com
 password: mystrongpassword
 ```
 
-For the target setup, edit the `config/linkebot.yaml` file inside the same directory.
+For the target setup, edit the `config/linkebot.yaml` file.
 
 ```yaml
 targets:
@@ -49,7 +49,7 @@ targets:
 
 ## Run
 
-To run the Linkebot use the following commands:
+To run Linkebot use following commands:
 
 ```bash
 python main.py
@@ -57,8 +57,7 @@ python main.py
 
 ## RUN GUI
 
-Run the GUI application using following command:
-From the root directory.
+Run the GUI application using following command from the root directory.
 
 ```
 python -m gui.linkebot_gui
