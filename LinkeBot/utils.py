@@ -3,6 +3,7 @@ import random
 import time
 
 import yaml
+from selenium.common.exceptions import NoSuchElementException
 
 
 def random_nap():
@@ -17,3 +18,19 @@ def yaml_loader(yaml_path):
         except yaml.YAMLError as exc:
             logging.error(f"There was an error {exc}")
             return None
+
+
+def check_exists_by_class_name(webdriver, element):
+    try:
+        webdriver.find_element_by_class_name(element)
+    except NoSuchElementException:
+        return False
+    return True
+
+
+def check_exists_by_xpath(webdriver, element):
+    try:
+        webdriver.find_element_by_xpath(element)
+    except NoSuchElementException:
+        return False
+    return True
