@@ -32,7 +32,6 @@ def pipe() -> None:
         linkebot.search(targets)
 
         logger.info("Operation completed!")
-        return
 
 
 if __name__ == "__main__":
