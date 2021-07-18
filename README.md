@@ -24,7 +24,7 @@ pip install -r requirements.dev.txt
 
 ## Driver Setup
 
-Linkebot uses `geckodriver` so download the latest driver from following link and set that up inside the `drivers` directory. Change the file name to `geckodriver`.
+Linkebot uses `geckodriver` so download the latest driver from following link and set that up inside the `drivers` directory. Change the file name to `geckodriver` or update the `DRIVERNAME` variable inside `settings.py` file.
 
 ## Additional requiements setup
 
