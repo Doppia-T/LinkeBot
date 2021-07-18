@@ -63,13 +63,6 @@ From the root directory.
 ```
 python -m gui.linkebot_gui
 ```
-
-Or just go into the `gui` directory and run:
-
-```
-python linkebot_gui.py
-```
-
 # Legal notes
 
 **Warnings and disclaimer**
