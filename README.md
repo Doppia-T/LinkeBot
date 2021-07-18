@@ -42,9 +42,9 @@ password: mystrongpassword
 For the target setup, edit the `config/linkebot.yaml` file inside the same directory.
 
 ```yaml
-pages: # Do not change this key
-  - "Amazon"
-  - "Apple"
+targets:
+  - "in/alice"
+  - "company/apple"
 ```
 
 ## Run
@@ -63,6 +63,7 @@ From the root directory.
 ```
 python -m gui.linkebot_gui
 ```
+
 # Legal notes
 
 **Warnings and disclaimer**
