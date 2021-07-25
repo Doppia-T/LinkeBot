@@ -1,0 +1,7 @@
+-r requirements.txt
+flake8
+black
+autoflake
+isort
+pre-commit
+mypy

@@ -1,0 +1,10 @@
+*.log
+.venv
+__pycache__
+!drivers
+!output
+output/**/**
+drivers/**/**
+.vscode
+*.ui
+*.csv

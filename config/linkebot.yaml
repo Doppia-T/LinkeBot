@@ -1,0 +1,24 @@
+# INSTRUCTIONS
+# Replace <email> and <password> with your LinkedIn login credentials
+
+email: username
+password: password
+
+# INSTRUCTIONS
+# Add your target's linkedin handles
+# IMPORTANT: handles should start with "in" if people "company" if company
+# Example: 
+# for target alice: https://www.linkedin.com/in/alice/
+# targets:
+#     - "in/alice" 
+# for target apple company: https://www.linkedin.com/company/apple/
+# targets:
+#     - "in/alice" 
+#     - "company/apple"
+
+targets: # Do not change this key
+  - "in/alice-bulloni-904970172"
+  - "in/gsesas"
+
+  # - "company/apple"
+  # - "company/microsoft"

@@ -1,6 +1,0 @@
-# INSTRUCTIONS
-# Replace <PAGETOSEARCH> with the LinkedId page to search
-# PAY ATTENTION TO SPACES
-
-
-<PAGETOSEARCH>

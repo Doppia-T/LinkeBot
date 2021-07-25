@@ -1,7 +1,0 @@
-# INSTRUCTIONS
-# Replace <EMAILADDRESS> and <PASSWORD> with your LinkedId login credentials
-# PAY ATTENTION TO SPACES: there must be only ONE after the "=" symbol and NONE after your credentials
-
-
-id = <EMAILADDRESS>
-password = <PASSWORD>
