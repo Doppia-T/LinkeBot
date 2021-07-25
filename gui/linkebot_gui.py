@@ -1,9 +1,11 @@
 import sys
+import threading
 from datetime import datetime as time
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
+from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox, QWidget
+from selenium.common.exceptions import TimeoutException
 
 from linkebot.core import LinkeBot
 from linkebot.handlers import get_linkedin_creds, get_targets
@@ -152,53 +154,73 @@ class LinkebotView(QWidget):
         self.label.setText(_translate("MainWindow", "Logs Output"))
 
 
-class Worker(QObject):
+class WorkerSignals(QObject):
     finished = pyqtSignal()
     progress = pyqtSignal(int)
     log = pyqtSignal(str)
+    success = pyqtSignal(bool)
+    result = pyqtSignal(object)
 
-    def __init__(self) -> None:
-        super().__init__()
+
+class Worker(QRunnable):
+    def __init__(self, *args, **kwargs):
+        super(Worker, self).__init__()
+
+        self.signals = WorkerSignals()
+        self.username = kwargs["username"]
+        self.password = kwargs["password"]
+        self.targets = kwargs["targets"]
         self.threadActive = True
 
     def stop(self) -> None:
         self.threadActive = False
-        # self.wait()
 
-    def run(self, username, password, targets):
-
+    @pyqtSlot()
+    def run(self):
         while self.threadActive:
+            try:
+                self.signals.log.emit(f"{time.now()}: Starting....")
 
-            with LinkeBot(username=username, password=password) as linkebot:
-                self.log.emit(f"{time.now()}: Logging in to linkedin.")
-                logged_in = linkebot.login()
-                if not logged_in:
-                    self.log.emit(f"{time.now()}: Error during login.")
-                    self.finished.emit()
+                with LinkeBot(
+                    username=self.username, password=self.password
+                ) as linkebot:
+                    self.signals.progress.emit(3)
+                    self.signals.log.emit(f"{time.now()}: Logging in to linkedin.")
+                    logged_in = linkebot.login()
+                    if not logged_in:
+                        self.signals.log.emit(f"{time.now()}: Error during login.")
+                        self.signals.finished.emit()
+                        self.stop()
+                        return
+                    self.signals.progress.emit(10)
 
-                self.log.emit(f"{time.now()}: Login succesfull.")
+                    targets = self.targets
+                    self.signals.log.emit(f"{time.now()}: Login succesfull.")
 
-                self.log.emit(f"{time.now()}: Getting the targets.")
+                    self.signals.log.emit(f"{time.now()}: Getting the targets.")
+                    if not isinstance(targets, list):
+                        targets = [targets]
 
-                targets = get_targets()
+                    linkebot.search(targets, self.signals.progress)
+                    self.signals.progress.emit(100)
 
-                for target in targets:
-                    self.log.emit(f"{time.now()}: Scraping target {target}.")
+                    self.signals.log.emit(f"{time.now()}: Operation completed!")
+                    self.signals.finished.emit()
+                    self.stop()
+            except TimeoutException:
+                self.signals.log.emit(
+                    f"{time.now()}: There was a timeout ERROR!!!!!!!!!!!!"
+                )
 
-                    linkebot.search(target)
-
-                self.log.emit(f"{time.now()}: Operation completed!")
-                self.finished.emit()
-                self.stop()
-
-    # self.finished.emit()
+                self.signals.finished.emit()
 
 
 class Controller:
     def __init__(self):
         self.view = None
-        self.thread = None
+        self.threadpool = None
         self.worker = None
+        self.event_stop = threading.Event()
 
     def start(self, view):
         app = QtWidgets.QApplication(sys.argv)
@@ -234,37 +256,37 @@ class Controller:
             return False
         return True
 
+    def enableButton(self):
+        self.view.startBtn.setEnabled(False)
+
     def stop_task(self):
-        if self.thread:
+        if self.threadpool:
             self.worker.stop()
-            # self.thread.deleteLater()
+            self.event_stop.set()
+            self.view.startBtn.setEnabled(False)
+
+        # self.thread.deleteLater()
 
         # self.handle_scraoer(state="STOP")
 
     def run_task(self):
         is_valid = self.validate()
         if is_valid:
-            self.thread = QThread()
-            self.worker = Worker()
-            self.worker.moveToThread(self.thread)
-
-            self.thread.started.connect(
-                lambda: self.worker.run(
-                    self.view.email.text(), self.view.password.text(), []
-                )
+            self.threadpool = QThreadPool()
+            print(
+                "Multithreading with maximum %d threads"
+                % self.threadpool.maxThreadCount()
             )
-            self.thread.started.connect(lambda: self.view.startBtn.setEnabled(False))
-            self.worker.finished.connect(self.thread.quit)
-            self.worker.finished.connect(self.worker.deleteLater)
-            self.thread.finished.connect(self.thread.deleteLater)
-            self.worker.progress.connect(self.reportProgress)
-            self.worker.log.connect(self.reportLogs)
-
-            self.thread.start()
-            self.thread.finished.connect(lambda: self.view.startBtn.setEnabled(True))
-            self.thread.finished.connect(
-                lambda: self.view.logs.append("Linkebot job completed.")
+            self.worker = Worker(
+                username=self.view.email.text(),
+                password=self.view.password.text(),
+                targets=self.view.searchInput.text().split(","),
             )
+
+            self.worker.signals.progress.connect(self.reportProgress)
+            self.worker.signals.log.connect(self.reportLogs)
+            self.worker.signals.finished.connect(self.enableButton)
+            self.threadpool.start(self.worker)
 
 
 if __name__ == "__main__":
