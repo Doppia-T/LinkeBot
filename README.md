@@ -44,7 +44,7 @@ For the target setup, edit the `config/linkebot.yaml` file.
 ```yaml
 targets:
   - "in/alice"
-  - "company/apple"
+  - "company/apple" # Company scraping TBD
 ```
 
 ## Run
@@ -60,7 +60,7 @@ python main.py
 Run the GUI application using following command from the root directory.
 
 ```
-python -m gui.linkebot_gui
+python -m linkebot.UI
 ```
 
 # Legal notes
