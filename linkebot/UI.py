@@ -7,8 +7,8 @@ from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox, QWidget
 from selenium.common.exceptions import TimeoutException
 
-from linkebot.core import LinkeBot
-from linkebot.handlers import get_linkedin_creds, get_targets
+from .core import LinkeBot
+from .handlers import get_linkedin_creds, get_targets
 
 
 class LinkebotView(QWidget):
