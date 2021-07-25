@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 
 import pandas as pd
 from selenium import webdriver
@@ -104,19 +105,20 @@ class LinkeBot:
 
         return not is_error
 
-    def search(self, targets):
+    def search(self, targets, progress_callback=None):
         # search for a specific "target", like a company or a person, within LinkedIn
 
         records = pd.DataFrame()
 
-        for target in targets:
+        for i, target in enumerate(targets):
+            if progress_callback:
+                progress_callback.emit((i / len(targets)) * 100)
 
             self.bot.get(LINKEDIN_BASE + target)
             identity, handle = target.split("/")
             main_el = WebDriverWait(self.bot, 10).until(
                 EC.presence_of_element_located((By.ID, "main"))
             )
-            from datetime import datetime
 
             agg_dir = OUTPUTDIR / str(datetime.now().date())
             target_dir = agg_dir / identity
