@@ -1,5 +1,4 @@
 import sys
-import threading
 from datetime import datetime as time
 
 from PyQt5 import QtCore, QtWidgets
@@ -214,7 +213,6 @@ class Controller:
         self.view = None
         self.threadpool = None
         self.worker = None
-        self.event_stop = threading.Event()
 
     def start(self, view):
         app = QtWidgets.QApplication(sys.argv)
