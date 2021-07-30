@@ -29,18 +29,24 @@ class LinkeBot:
     def __init__(self, username: str, password: str) -> None:
         self.username = username
         self.password = password
-        self.bot: WebDriver
+        self.bot = None
+        self.__enter__()
 
     def __enter__(self):
-        self.bot: WebDriver = webdriver.Firefox(
-            options=options,
-            executable_path=BASEDIR / "drivers" / DRIVERNAME,
-        )
+        if not self.bot:
+            self.bot: WebDriver = webdriver.Firefox(
+                options=options,
+                executable_path=BASEDIR / "drivers" / DRIVERNAME,
+            )
 
         return self
 
-    def __exit__(self, type, value, traceback):
+    def terminate(self):
+        self.bot.close()
         self.bot.quit()
+
+    def __exit__(self, type, value, traceback):
+        self.terminate()
 
     def login(self) -> bool:
         is_error = False
