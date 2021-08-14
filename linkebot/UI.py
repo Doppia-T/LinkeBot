@@ -3,7 +3,7 @@ from datetime import datetime as time
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
-from PyQt5.QtWidgets import QMessageBox, QWidget
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QWidget
 
 from .core import LinkeBot
 from .handlers import get_linkedin_creds, get_targets
@@ -104,9 +104,22 @@ class LinkebotView(QWidget):
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 5, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
+        # self.menubar.setGeometry(QtCore.QRect(0, 0, 887, 26))
+        self.menubar.setObjectName("menubar")
+        self.menuFile = QtWidgets.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
+        MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+        self.actionSetup_creds = QtWidgets.QAction(MainWindow)
+        self.actionSetup_creds.setObjectName("actionSetup_creds")
+        self.actionSetup_comments = QtWidgets.QAction(MainWindow)
+        self.actionSetup_comments.setObjectName("actionSetup_comments")
+        self.menuFile.addAction(self.actionSetup_creds)
+        self.menuFile.addAction(self.actionSetup_comments)
+        self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow, controller)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -120,13 +133,14 @@ class LinkebotView(QWidget):
 
     def retranslateUi(self, MainWindow, controller):
         _translate = QtCore.QCoreApplication.translate
+        self.MainWindow = MainWindow
 
-        _email, _password = get_linkedin_creds()
+        self._email, self._password = get_linkedin_creds()
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.emailLabel.setText(_translate("MainWindow", "Email"))
-        self.email.setText(_email)
-        self.passwordLabel.setText(_translate("MainWindow", "Password"))
-        self.password.setText(_password)
+        self.emailLabel.setText(_translate("MainWindow", "✉️ Email"))
+        self.email.setText(self._email)
+        self.passwordLabel.setText(_translate("MainWindow", "🔐 Password"))
+        self.password.setText(self._password)
 
         self.logs.setHtml(
             _translate(
@@ -150,6 +164,24 @@ class LinkebotView(QWidget):
         self.stopBtn.setText(_translate("MainWindow", "Stop"))
         self.stopBtn.clicked.connect(lambda x: controller.stop_task(initial=True))
         self.label.setText(_translate("MainWindow", "Logs Output"))
+        self.menuFile.setTitle(_translate("MainWindow", "Settings"))
+        self.actionSetup_creds.setText(_translate("MainWindow", "Load Config"))
+        self.actionSetup_creds.triggered.connect(
+            lambda: self.showDialog(controller, "creds Name", setting_type="creds")
+        )
+        self.actionSetup_comments.setText(_translate("MainWindow", "Load Comments"))
+        self.actionSetup_comments.triggered.connect(
+            lambda: self.showDialog(controller, "comments", setting_type="comments")
+        )
+
+    def showDialog(self, controller, form_label=None, setting_type=None):
+        fname = QFileDialog.getOpenFileName(
+            self, "Open file", "c:\\", "Yaml files (*.yaml *.yml)"
+        )
+        if fname[0]:
+            self._email, self._password = get_linkedin_creds(config_path=fname[0])
+            self.email.setText(self._email)
+            self.password.setText(self._password)
 
 
 class WorkerSignals(QObject):
