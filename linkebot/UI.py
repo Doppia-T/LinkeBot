@@ -167,11 +167,11 @@ class LinkebotView(QWidget):
         self.menuFile.setTitle(_translate("MainWindow", "Settings"))
         self.actionSetup_creds.setText(_translate("MainWindow", "Load Config"))
         self.actionSetup_creds.triggered.connect(
-            lambda: self.showDialog(controller, "creds Name", setting_type="creds")
+            lambda: self.showDialog(controller, "creds Name", setting_type="CONFIG")
         )
         self.actionSetup_comments.setText(_translate("MainWindow", "Load Comments"))
         self.actionSetup_comments.triggered.connect(
-            lambda: self.showDialog(controller, "comments", setting_type="comments")
+            lambda: self.showDialog(controller, "comments", setting_type="COMMENTS")
         )
 
     def showDialog(self, controller, form_label=None, setting_type=None):
@@ -179,9 +179,12 @@ class LinkebotView(QWidget):
             self, "Open file", "c:\\", "Yaml files (*.yaml *.yml)"
         )
         if fname[0]:
-            self._email, self._password = get_linkedin_creds(config_path=fname[0])
-            self.email.setText(self._email)
-            self.password.setText(self._password)
+            if setting_type == "CONFIG":
+                self._email, self._password = get_linkedin_creds(config_path=fname[0])
+                self.email.setText(self._email)
+                self.password.setText(self._password)
+            if setting_type == "COMMENTS":
+                self.commentInput.setText(fname[0])
 
 
 class WorkerSignals(QObject):
@@ -201,7 +204,10 @@ class Worker(QRunnable):
         self.password = kwargs["password"]
         self.targets = kwargs["targets"]
         self.to_search = kwargs["to_search"]
+        self.to_like = kwargs["to_like"]
+        self.to_comment = kwargs["to_comment"]
         self.threadActive = True
+
         self.bot = LinkeBot(username=self.username, password=self.password)
 
     def stop(self) -> None:
@@ -306,6 +312,8 @@ class Controller:
                 password=self.view.password.text(),
                 targets=self.view.searchInput.text().split(","),
                 to_search=self.view.searchCheck.isChecked(),
+                to_like=self.likesCheck.isChecked(),
+                to_comment=self.commentCheck.isChecked(),
             )
 
             self.worker.signals.progress.connect(self.reportProgress)
