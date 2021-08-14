@@ -168,6 +168,7 @@ class Worker(QRunnable):
         self.username = kwargs["username"]
         self.password = kwargs["password"]
         self.targets = kwargs["targets"]
+        self.to_search = kwargs["to_search"]
         self.threadActive = True
         self.bot = LinkeBot(username=self.username, password=self.password)
 
@@ -191,14 +192,15 @@ class Worker(QRunnable):
                 return
             self.signals.progress.emit(10)
 
-            targets = self.targets
             self.signals.log.emit(f"{time.now()}: Login succesfull.")
 
-            self.signals.log.emit(f"{time.now()}: Getting the targets.")
-            if not isinstance(targets, list):
-                targets = [targets]
+            if self.to_search:
+                targets = self.targets
+                self.signals.log.emit(f"{time.now()}: Getting the targets.")
+                if not isinstance(targets, list):
+                    targets = [targets]
 
-            linkebot.search(targets, self.signals.progress)
+                linkebot.search(targets, self.signals.progress)
             self.signals.progress.emit(100)
 
             self.signals.log.emit(f"{time.now()}: Operation completed!")
@@ -224,7 +226,6 @@ class Controller:
 
     def cleanup(self):
         self.view.progressBar.setProperty("value", 0)
-
         self.view.logs.clear()
 
     def start_scraper(self):
@@ -272,6 +273,7 @@ class Controller:
                 username=self.view.email.text(),
                 password=self.view.password.text(),
                 targets=self.view.searchInput.text().split(","),
+                to_search=self.view.searchCheck.isChecked(),
             )
 
             self.worker.signals.progress.connect(self.reportProgress)
