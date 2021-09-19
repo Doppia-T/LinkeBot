@@ -1,3 +1,4 @@
+import random
 import time
 from datetime import datetime
 
@@ -29,7 +30,7 @@ class LinkeBot:
     def __init__(self, username: str, password: str) -> None:
         self.username = username
         self.password = password
-        self.bot = None
+        self.bot: WebDriver = None
         self.__enter__()
 
     def __enter__(self):
@@ -50,7 +51,7 @@ class LinkeBot:
 
     def login(self) -> bool:
         is_error = False
-        bot = self.bot
+        bot: WebDriver = self.bot
         bot.get(LINKEDIN_BASE)
         login_page: WebDriver = WebDriverWait(bot, DELAY).until(
             EC.presence_of_element_located((By.CLASS_NAME, "sign-in-form-container"))
@@ -111,10 +112,39 @@ class LinkeBot:
 
         return not is_error
 
+    def like_random_posts(self, targets) -> None:
+        for i, target in enumerate(targets):
+            logger.info(f"Linking random posts of target {target}")
+            self.bot.get(LINKEDIN_BASE + target + "/detail/recent-activity/shares/")
+            post_el = WebDriverWait(self.bot, 10).until(
+                EC.presence_of_element_located((By.ID, "main"))
+            )
+
+            elements = post_el.find_element_by_xpath(
+                "//div[contains(@class, 'pv-recent-activity-detail__outlet-container')]"
+            )
+            div_child = elements.find_element_by_xpath("./child::*")
+            childrens = div_child.find_elements_by_xpath("./child::*")
+            logger.info(f"User has {len(childrens)} posts")
+            random_post = random.choice(childrens)
+            logger.info("Randomly chosing 1 post")
+
+            for c in [random_post]:
+                _id = c.get_attribute("id")
+                logger.info(f"Liking post with id {_id}")
+                btn = c.find_element_by_xpath(
+                    "//button[contains(@class, 'artdeco-button')]"
+                )
+
+                btn.find_element_by_xpath(
+                    "//div[contains(@class, 'artdeco-button__text')]"
+                ).click()
+                time.sleep(1)
+
     def search(self, targets, progress_callback=None):
         # search for a specific "target", like a company or a person, within LinkedIn
 
-        records = pd.DataFrame()
+        records = []
 
         for i, target in enumerate(targets):
             if progress_callback:
@@ -138,10 +168,11 @@ class LinkeBot:
             elif identity == "in":
                 logger.info(f"Scraping people '{handle}'")
                 data = retrieve_people_data(main_el)
+
                 data.to_csv(target_dir / f"{handle}.csv", index=False)
 
             records.append(data.copy())
             logger.info(f"Individual output saved at: {target_dir}/{handle}.csv")
 
-        records.to_csv(f"{agg_dir}/output.csv", index=False)
+        pd.concat(records).to_csv(f"{agg_dir}/output.csv", index=False)
         logger.info(f"Agg output saved at: {agg_dir}/output.csv")

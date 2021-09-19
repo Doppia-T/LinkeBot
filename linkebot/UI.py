@@ -239,6 +239,8 @@ class Worker(QRunnable):
                     targets = [targets]
 
                 linkebot.search(targets, self.signals.progress)
+                if self.to_like:
+                    linkebot.like_random_posts(targets)
             self.signals.progress.emit(100)
 
             self.signals.log.emit(f"{time.now()}: Operation completed!")
@@ -312,8 +314,8 @@ class Controller:
                 password=self.view.password.text(),
                 targets=self.view.searchInput.text().split(","),
                 to_search=self.view.searchCheck.isChecked(),
-                to_like=self.likesCheck.isChecked(),
-                to_comment=self.commentCheck.isChecked(),
+                to_like=self.view.likeCheck.isChecked(),
+                to_comment=self.view.commentCheck.isChecked(),
             )
 
             self.worker.signals.progress.connect(self.reportProgress)
