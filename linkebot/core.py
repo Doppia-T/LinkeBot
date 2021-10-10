@@ -1,4 +1,3 @@
-import random
 import time
 from datetime import datetime
 
@@ -123,23 +122,29 @@ class LinkeBot:
             elements = post_el.find_element_by_xpath(
                 "//div[contains(@class, 'pv-recent-activity-detail__outlet-container')]"
             )
-            div_child = elements.find_element_by_xpath("./child::*")
-            childrens = div_child.find_elements_by_xpath("./child::*")
-            logger.info(f"User has {len(childrens)} posts")
-            random_post = random.choice(childrens)
-            logger.info("Randomly chosing 1 post")
 
-            for c in [random_post]:
+            div_child = elements.find_element_by_xpath("./child::*")
+            childrens = div_child.find_elements_by_xpath(
+                "//div[contains(@class, 'occludable-update') and contains(@class, 'ember-view')]"
+            )
+            logger.info(f"User has {len(childrens)} posts")
+            # random_post = random.choice(childrens)
+
+            logger.info("Randomly liking posts in position 1, 3, 5, 7 and so on")
+            for c in childrens[1::2]:
                 _id = c.get_attribute("id")
                 logger.info(f"Liking post with id {_id}")
-                btn = c.find_element_by_xpath(
-                    "//button[contains(@class, 'artdeco-button')]"
+                like_el = c.find_element_by_xpath(
+                    "//span[contains(@class, 'reactions-react-button') and contains(@class, 'feed-shared-social-action-bar__action-button')\
+                         and contains(@class, 'feed-shared-social-action-bar__action-button--expand')]"
                 )
+                # btn = like_el.find_element_by_xpath(
+                #     "//button[contains(@class, 'artdeco-button')]"
+                # )
 
-                btn.find_element_by_xpath(
-                    "//div[contains(@class, 'artdeco-button__text')]"
-                ).click()
+                like_el.find_element_by_xpath("//li-icon[@type='like-icon']").click()
                 time.sleep(1)
+            logger.info("Finished liking posts")
 
     def search(self, targets, progress_callback=None):
         # search for a specific "target", like a company or a person, within LinkedIn
