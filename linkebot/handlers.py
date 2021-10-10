@@ -50,9 +50,12 @@ def retrieve_people_data(el_handle: WebDriver) -> pd.DataFrame:
     sub_title = el_handle.find_element_by_class_name("text-body-medium")
     data["sub_title"] = sub_title.text
     data["ingestion_timestamp"] = datetime.now()
-    data["bio"] = el_handle.find_element_by_css_selector(
-        ".inline-show-more-text.t-14"
-    ).text
+    try:
+        data["bio"] = el_handle.find_element_by_css_selector(
+            ".inline-show-more-text.t-14"
+        ).text
+    except Exception:
+        data["bio"] = ""
 
     return data.copy()
 
